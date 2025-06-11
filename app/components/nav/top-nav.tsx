@@ -28,22 +28,22 @@ export default function TopNav() {
                     </MenubarTrigger>
                     <MenubarContent>
                         <MenubarItem>
-                            Task 1
+                            <Link href="/dashboard">Go to Dashboard</Link>
                         </MenubarItem>
                         <MenuSeparator/>
                         <MenubarItem>
-                            Task 2
+                            <Link href='/dashboard/create-video'>Create Video</Link>
                         </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
 
                 <MenubarMenu>
                     <SignedOut>
-                        <SignInButton />
+                        <SignInButton/>
                     </SignedOut>
                 </MenubarMenu>
                 <SignedIn>
-                    <UserButton />
+                    <UserButton/>
                 </SignedIn>
             </div>
         </Menubar>

@@ -4,7 +4,7 @@ import "./globals.css";
 import TopNav from "@/app/components/nav/top-nav";
 import {ThemeProvider} from "@/app/components/theme/theme-provider";
 import {ClerkProvider} from "@clerk/nextjs";
-
+import {VideoProvider} from "@/context/video";
 
 
 const audiowide = Audiowide({
@@ -33,8 +33,11 @@ export default function RootLayout({
                 enableSystem
                 disableTransitionOnChange
             >
-                <TopNav/>
-                {children}
+                <VideoProvider>
+                    <TopNav/>
+                    {children}
+                </VideoProvider>
+
             </ThemeProvider>
             </body>
             </html>
