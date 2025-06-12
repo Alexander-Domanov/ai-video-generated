@@ -3,6 +3,7 @@ import {useVideo} from "@/context/video";
 import {Button} from "@/app/components/ui/button";
 import Image from 'next/image'
 import {storyOptions, styleOptions} from "@/constant";
+import {Loader2Icon} from "lucide-react";
 
 export default function CreateVideo() {
     const {
@@ -18,7 +19,7 @@ export default function CreateVideo() {
         audio,
         captions,
     } = useVideo();
-    console.log(selectedStory, selectedStyle)
+
     return (
         <div className="p-10 bg-gray-800 text-white">
             <h1 className="text-2xl font-bold mb-5">Create video page</h1>
@@ -85,17 +86,17 @@ export default function CreateVideo() {
                                 alt={style.name}
                                 layout="fill"
                                 objectFit="cover"
-                                className={`z-10 transition-transform duration-200 ${
+                                className={`z-0 transition-transform duration-200 ${
                                     selectedStyle === style.name ? "scale-105" : ""
                                 }`}
                             />
                             <div
-                                className={`z-0 absolute inset-0 flex items-center justify-center transition-opacity duration-200 ${
+                                className={`z-10 absolute inset-0 flex bg-transparent items-center justify-center transition-opacity duration-200 ${
                                     selectedStyle === style.name
                                         ? 'bg-transparent'
                                         : 'bg-black bg-opacity-40'}`}
                             >
-                        <span className={'font-semibold text-white text-lg'}>
+                        <span className={'font-semibold text-blue-500 text-lg'}>
                             {style.name}
                         </span>
                             </div>
@@ -106,11 +107,15 @@ export default function CreateVideo() {
 ≠
             <Button
                 onClick={handleSubmit}
-                disabled={!selectedStory || !selectedStyle || !customPrompt}
+                disabled={(!selectedStory && !customPrompt) || !selectedStyle}
                 className="w-full h-12 bg-green-500 text-white text-lg rounded hover:bg-green-700"
             >
+                {loading && <Loader2Icon size={24} className="mr-4 animate-spin"/> as React.ReactNode}
                 Create Video
             </Button>
+           <pre>
+               {JSON.stringify(images,null,4)}
+           </pre>
         </div>
     )
 }

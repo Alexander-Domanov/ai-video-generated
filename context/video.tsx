@@ -3,6 +3,8 @@ import {
     ChangeEvent,
     createContext, Dispatch, ReactNode, SetStateAction, useContext, useState,
 } from "react"
+import {createVideoAi} from "@/actions/geminiai";
+import {generateImageAi} from "@/actions/replicateai";
 
 const initialState = {
     script: "Script...",
@@ -32,6 +34,11 @@ interface VideoContextType {
     handleStyleSelect: (style: string) => void;
     handleCustomPromptChange: (e: ChangeEvent<HTMLInputElement>) => void;
     handleSubmit: () => void;
+}
+
+interface VideoScriptItem {
+    imagePrompt: string
+    textContend: string
 }
 
 const VideoContext = createContext<VideoContextType | undefined>(undefined)
@@ -65,11 +72,45 @@ export const VideoProvider = ({children}: {
         setSelectedStory("Custom Prompt");
     };
 
-    const handleSubmit = () => {
-        const videoData = {
-            story: selectedStory || 'Custom Prompt',
-            style: selectedStyle,
-            prompt: customPrompt || selectedStory
+    const handleSubmit = async () => {
+        console.log('handleSubmit')
+        try {
+            setLoading(true)
+            setLoadingMessage("Generating video script...")
+            const videoResponse: any = await createVideoAi(
+                `Create a 30 second log
+                ${customPrompt || selectedStory}
+                video script. Include AI imagePrompts for each scene in ${selectedStyle} format. Provide the result in JSON format with 'imagePrompt' and 'textContend' fields`
+            )
+            if (!videoResponse.success) {
+                setLoading(false)
+                setLoadingMessage("Failed to generate video script")
+                return
+            }
+            if (videoResponse.data.length >= 1) {
+                setLoadingMessage("Generating images from the script...")
+                console.log('Generating images from the script..."')
+                const imageGenerationPromises: Promise<string | null>[] = videoResponse.data.map(async (item: VideoScriptItem): Promise<string | null> => {
+                    try {
+                        const imageUrl: string = await generateImageAi(item.imagePrompt)
+                        return imageUrl
+                    } catch (err) {
+                        console.error(err)
+                        return null
+                    }
+                })
+
+                const images: (string | null)[] = await Promise.all(imageGenerationPromises)
+                const validImages:any = images.filter((image) => image !== null)
+                setImages(validImages)
+            }
+
+        } catch (err) {
+            console.log(err)
+            setLoadingMessage("Failed to generate video script")
+        } finally {
+            setLoading(false)
+            setLoadingMessage("")
         }
     }
 
